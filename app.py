@@ -2,191 +2,77 @@ import pymongo
 from pymongo.server_api import ServerApi
 from bson.objectid import ObjectId
 
-
-
-
-
 client = pymongo.MongoClient("mongodb+srv://iznthelindo:190204@mercadoLivre.1cjw9r7.mongodb.net/mercadoLivre?retryWrites=true&w=majority", server_api=ServerApi('1'))
 db = client.mercadoLivre
 
 global mydb
 mydb = client.mercadoLivre
 
-mycol     = ["usuario"]
+mycol = ["usuario"]
 mycolvend = ["vendedor"]
 mycolprod = ["produtos"]
-mycolfav =  ["favoritos"]
-mycolcom =  ["compras"]
+mycolfav = ["favoritos"]
+mycolcom = ["compras"]
 
+print("--- BEM VINDO AO MERCADO LIVRE ---")
 
-print ("--- BEM VINDO AO MERCADO LIVRE ---")
-
-print ("\n cadastro ")
-
-print ("1 - cadastrar usuario")
-print ("2 - cadastro de produto ")
-print ("3 - cadastro de vendedor ")
-print ("4 - cadastro de compras ")
-print ("5 - cadastro de favoritos ")
-
-
-print ("\n CONSULTA GERAL ")
-
-print ("6 - consulta geral de usuario")
-print ("7 - consulta geral de produto")
-print ("8 - consulta geral de vendedor")
-print ("9- consulta geral de compras")
-print ("10- consulta geral de favoritos")
-
-
-print ("\n cCONSULTA ESPECIFICA ")
-print ("11- consultar usuario")
-print ("11.1- listar usuario")
-print ("12 - consultar produto")
-print ("13 - consultar vendedor")
-print ("14 - consultar compras")
-print ("15 - consultar favoritos")
-
-
-print ("\n ATUALIZAR *** ")
-
-print ("16 - atualizar usuario")
-print ("17 - atualizar produto")
-print ("18 - atualizar vendedor")
-print ("19 - atualizar compras")
-print ("20 - atualizar favoritos")
-
-
-print ("\n DELETAR ***")
-print ("21 - deletar usuario")
-print ("22 - deletar produto")
-print ("23 - deletar vendedor")
-print ("24 - deletar compras")
-print ("25 - deletar favoritos")
-
-print ("SAIR")
-opção = int(input("Digite a opção desejada: "))
-
-
-def insert(nome, cpf,email, rua, numero, bairro, cidade, estado, cep):
-    #Insert
+def insert(nome, cpf, email, rua, numero, bairro, cidade, estado, cep):
     global mydb
     mycol = mydb.usuario
     print("\n####INSERT####")
-    mydict = { "nome": nome, "cpf":cpf, "email":email,  "rua": rua, "numero": numero, "bairro": bairro, "cidade": cidade, "estado": estado, "cep": cep}
+    mydict = {"nome": nome, "cpf": cpf, "email": email, "rua": rua, "numero": numero, "bairro": bairro, "cidade": cidade, "estado": estado, "cep": cep}
     x = mycol.insert_one(mydict)
     print(x.inserted_id)
 
-if opção == 1:
-    nome = str(input("digite seu nome: "))
-    cpf = str(input("digite seu cpf: "))
-    email =  str(input("digite seu email: "))
-    rua =    str(input("digite sua rua: "))
-    numero = str(input("digite seu numero: "))
-    bairro = str(input("digite seu bairro: "))
-    cidade = str(input("digite sua cidade: "))
-    estado = str(input("digite seu estado: "))
-    cep =    str(input("digite seu cep: "))
-
-    insert(nome, cpf, email, rua, numero,bairro , cidade, estado, cep)
-
-def insertproduto(produto ,quantidade , preco):
-    
+def insertproduto(produto, quantidade, preco):
     global mydb
     mycolprod = mydb.produtos
     print("\n####INSERT####")
-    mydict = { "produto": produto, "quantidade":quantidade, "preco":preco }
+    mydict = {"produto": produto, "quantidade": quantidade, "preco": preco}
     x = mycolprod.insert_one(mydict)
     print(x.inserted_id)
 
-if opção == 2:
-    produto = str(input("produto: "))
-    quantidade = str(input("digite a quantidade: "))
-    preco = str(input("digite o preço final: "))
-
-    insertproduto(produto, quantidade, preco)
-
-
-
 def insertvendedor(vendedor, codigo):
-    
     global mydb
     mycolvend = mydb.vendedor
     print("\n####INSERT####")
-    mydict = { "vendedor": vendedor, "codigo": codigo,  }
+    mydict = {"vendedor": vendedor, "codigo": codigo}
     x = mycolvend.insert_one(mydict)
     print(x.inserted_id)
 
-if opção == 3:
-    vendedor= str(input("nome do vendedor : "))
-    código = str(input("digite o código do vendedor: "))
-    end = []
-
-    insertvendedor(vendedor, código)
-
-
 def insertcompras(nome_prod, codigo, valor):
-
     global mydb
     mycolcom = mydb.compras
     print("\n####INSERT####")
-    mydict = { "nomeprod": nome_prod, "codigo": codigo, "valor": valor  }
+    mydict = {"nomeprod": nome_prod, "codigo": codigo, "valor": valor}
     x = mycolcom.insert_one(mydict)
     print(x.inserted_id)
 
-if opção == 4:
-    nome_prod = str(input("nome do produto: "))
-    código = int(input("digite o código do produto: "))
-    valor =  str(input("digite o valor do produto: "))
-    end = []
-
-    insertcompras(nome_prod, código, valor)
-
 def insertfavoritos(nome_prod, codigo):
-
     global mydb
     mycolfav = mydb.favoritos
     print("\n####INSERT####")
-    mydict = { "nomeprod": nome_prod, "codigo": codigo,  }
+    mydict = {"nomeprod": nome_prod, "codigo": codigo}
     x = mycolfav.insert_one(mydict)
     print(x.inserted_id)
 
-if opção == 5:
-    nome_prod = str(input("nome do produto: "))
-    código = str(input("digite o código do produto: "))
-    end = []
-
-    insertfavoritos(nome_prod, código)
-
-
-
-
 def findSort(nome):
-    #Sort
     global mydb
     mycol = mydb.usuario
-    print("\n####SORT####") 
+    print("\n####SORT####")
     mydoc = mycol.find().sort("nome")
     for x in mydoc:
         print(x)
 
-if opção == 6:
-    findSort("nome")
-
 def findSortprodutos(produto):
-    
     global mydb
     mycolprod = mydb.produtos
-    print("\n####SORT####") 
+    print("\n####SORT####")
     mydoc = mycolprod.find().sort(produto)
     for x in mydoc:
         print(x)
 
-if opção == 7:
-    findSortprodutos("produto")
-
 def findSortvendedor(vendedor):
-
     global mydb
     mycolvend = mydb.vendedor
     print("\n####SORT####")
@@ -194,11 +80,7 @@ def findSortvendedor(vendedor):
     for x in mydoc:
         print(x)
 
-if opção == 8:
-    findSortvendedor("vendedor")
-
 def findSortcompras(compras):
-
     global mydb
     mycolcom = mydb.compras
     print("\n####SORT####")
@@ -206,276 +88,200 @@ def findSortcompras(compras):
     for x in mydoc:
         print(x)
 
-if opção == 9:
-    findSortcompras("compras")
-
 def findSortfavoritos(favoritos):
-    
-        global mydb
-        mycolfav = mydb.favoritos
-        print("\n####SORT####")
-        mydoc = mycolfav.find().sort(favoritos)
-        for x in mydoc:
-            print(x)
-
-if opção == 10:
-    findSortfavoritos("favoritos")
-
-
-
-
-def findQuery(nome):
-    #Query
-    global mydb
-    mycol = mydb.usuario
-    print("\n####QUERY####")
-    myquery = { "nome": nome }
-    mydoc = mycol.find(myquery)
-    for x in mydoc:
-        print(x)
-
-if opção == 11:
-    nome = str(input("digite o nome do usuario: "))
-    findQuery(nome)
-
-def findQueryprodutos(produtos):
-
-    global mydb
-    mycolprod = mydb.produtos
-    print("\n####QUERY####")
-    myquery = { "produto": produtos}
-    mydoc = mycolprod.find(myquery)
-    for x in mydoc:
-        print(x)
-
-
-
-if opção == 11.1:
-    listarusuarios = str(input("digite o nome do usuario: "))
-    findQuery(listarusuarios)
-
-def findQueryUsuarios (nome):
-
-    global mydb
-    mycol = mydb.usuario
-    print("\n####QUERY####")
-    myquery = { "nome": nome }
-    mydoc = mycol.find(myquery)
-    for x in mydoc:
-        print(x)
-
-if opção == 12:
-   produtos = str(input("digite o nome do produto: "))
-   findQueryprodutos(produtos)
-
-def findQueryvendedor(vendedor):
-
-    global mydb
-    mycolvend = mydb.vendedor
-    print("\n####QUERY####")
-    myquery = { "vendedor": vendedor}
-    mydoc = mycolvend.find(myquery)
-    for x in mydoc:
-        print(x)
-
-if opção == 13:
-    vendedor = str(input("digite o nome do vendedor: "))
-    findQueryvendedor(vendedor)
-
-def findQuerycompras(compras):
-
-    global mydb
-    mycolcom = mydb.compras
-    print("\n####QUERY####")
-    myquery = { "compras": compras }
-    mydoc = mycolcom.find(myquery)
-    for x in mydoc:
-        print(x)
-
-if opção == 14:
-    compras = str(input("digite o nome da compra: "))
-    findQuerycompras(compras)
-
-def findQueryfavoritos(favoritos):
-
     global mydb
     mycolfav = mydb.favoritos
-    print("\n####QUERY####")
-    myquery = { "favoritos": favoritos }
-    mydoc = mycolfav.find(myquery)
+    print("\n####SORT####")
+    mydoc = mycolfav.find().sort(favoritos)
     for x in mydoc:
         print(x)
 
-if opção == 15:
-    favoritos = str(input("digite o nome do favorito: "))
-    findQueryfavoritos(favoritos)
-
-
-def updateQuery(nome, cpf, email, rua, numero, bairro, cidade, estado, cep):
-
-    global mydb
-    mycol = mydb.usuario
-    print("\n####UPDATE####")
-    myquery = { "nome": nome }
-    newvalues = { "$set": { "nome": nome , "cpf": cpf, "email": email, "rua":rua, "numero":numero, "bairro":bairro,"cidade":cidade, "estado": estado, "cep": cep  } }
-    mycol.update_one(myquery, newvalues)
-    mydoc = mycol.find(myquery)
-    for x in mydoc:
-        print(x)
-
-if opção == 16:
-    nome = str(input("digite o  novo nome do usuario: "))
-    cpf = int(input("digite o  novo cpf do usuario: "))
-    email = str(input("digite o  novo email do usuario: "))
-    rua = str(input("digite a  nova rua do usuario: "))
-    numero = int(input("digite o  novo numero do usuario: "))
-    bairro = str(input("digite o  novo bairro do usuario: "))
-    cidade = str(input("digite a  nova cidade do usuario: "))
-    estado = str(input("digite o  novo estado do usuario: "))
-    cep = int(input("digite o  novo cep do usuario: "))
-
-    updateQuery(nome, cpf, email,rua, numero, bairro, cidade, estado, cep )
-
-def updateQueryprodutos(produto, quantidade,preco):
-
-    global mydb
-    mycol = mydb.usuario
-    print("\n####UPDATE####")
-    myquery = { "produto": produto }
-    newvalues = { "$set": { "produto": produto , "quantidade": quantidade, "preco": preco } }
-    mycol.update_one(myquery, newvalues)
-    mydoc = mycol.find(myquery)
-    for x in mydoc:
-        print(x)
-if opção == 17:
-
-    nome = str(input("digite o nome do produto: "))
-    quantidade =int(input("digite a quantidade do produto: "))
-    preco = int(input("digite o preço do produto: "))
-    updateQueryprodutos( produto, quantidade, preco)
-
-def updateQueryvendedor(vendedor, código):
-
-    global mydb
-    mycolvend = mydb.vendedor
-    print("\n####UPDATE####")
-    myquery = { "vendedor": vendedor, "codigo": código  }
-    newvalues = { "$set": {"vendedor": vendedor, "codigo": código } }
-  
-
-if opção == 18:
-    vendedor = str(input("digite o nome do vendedor: "))
-    código = int(input("digite o código do vendedor: "))
-    updateQueryvendedor(vendedor, código)
-
-def updateQuerycompras(compras, quantidade, valor):
-
-    global mydb
-    mycolcom = mydb.compras
-    print("\n####UPDATE####")
-    myquery = { "compras": compras, "quantidade": quantidade, "valor": valor }
-    newvalues = { "$set": {"compras": compras, "quantidade": quantidade, "valor": valor } }
-
-if opção == 19:
-        compras = str(input("digite o nome da compra: "))
-        quantidade = int(input("digite a quantidade da compra: "))
-        valor = int(input("digite o valor da compra: "))
-        updateQuerycompras(compras, quantidade, valor)
-
-def updateQueryfavoritos(favoritos, quantidade, valor):
-
-    global mydb
-    mycolfav = mydb.favoritos
-    print("\n####UPDATE####")
-    myquery = { "favoritos": favoritos, "quantidade": quantidade, "valor": valor }
-    newvalues = { "$set": {"favoritos": favoritos, "quantidade": quantidade, "valor": valor } }
-
-if opção == 20:
-
-    favoritos = str(input("digite o nome do favorito: "))
-    quantidade = int(input("digite a quantidade do favorito: "))
-    valor = int(input("digite o valor do favorito: "))
-    updateQueryfavoritos(favoritos, quantidade, valor)
-
-
-
-
-def deleteQuery(cpf):
-
+def delete(query):
     global mydb
     mycol = mydb.usuario
     print("\n####DELETE####")
-    myquery = { "cpf": cpf }
-    mycol.delete_one(myquery)
-    mydoc = mycol.find(myquery)
-    for x in mydoc:
-        print(x)
+    x = mycol.delete_many(query)
+    print(x.deleted_count, " documento(s) deletado(s).")
 
-if opção == 21:
-    cpf =int(input("digite o cpf do usuario: "))
-    deleteQuery(cpf)
-
-
-
-def deleteQueryvendedor( codigo):
-
+def deletevendedor(query):
     global mydb
     mycolvend = mydb.vendedor
     print("\n####DELETE####")
-    myquery = {"codigo": codigo}
-    mycolvend.delete_one(myquery)
-    mydoc = mycolvend.find(myquery)
+    x = mycolvend.delete_many(query)
+    print(x.deleted_count, " documento(s) deletado(s).")
 
-if opção == 23:
-    codigo = str(input("digite o codigo do vendedor:"))
-    deleteQueryvendedor(codigo)
-
-    
-
-def deleteQuerycompras(compras):
+def deletecompras(query):
     global mydb
     mycolcom = mydb.compras
     print("\n####DELETE####")
-    print("\nDeletado com sucesso!")
-    myquery = { "compras": compras }
-    mycolcom.delete_one(myquery)
-    mydoc = mycolcom.find(myquery)
-    for x in mydoc:
-        print(x)
+    x = mycolcom.delete_many(query)
+    print(x.deleted_count, " documento(s) deletado(s).")
 
-if opção == 24:
-    compras = str(input("digite o nome da compra: " ))
-    deleteQuerycompras(compras)
-
-def deleteQueryfavoritos(codigo):
-
+def deletefavoritos(query):
     global mydb
     mycolfav = mydb.favoritos
     print("\n####DELETE####")
-    print("\nDeletado com sucesso!")
-    myquery = { "codigo": codigo}
-    mycolfav.delete_one(myquery)
-    mydoc = mycolfav.find(myquery)
+    x = mycolfav.delete_many(query)
+    print(x.deleted_count, " documento(s) deletado(s).")
 
+def update(query, newvalues):
+    global mydb
+    mycol = mydb.usuario
+    print("\n####UPDATE####")
+    x = mycol.update_many(query, newvalues)
+    print(x.modified_count, " documento(s) atualizado(s).")
 
-if opção == 25:
-    print(mycolfav)
-    codigo = str(input("digite o nome do seu favoritado: "))
+def updatevendedor(query, newvalues):
+    global mydb
+    mycolvend = mydb.vendedor
+    print("\n####UPDATE####")
+    x = mycolvend.update_many(query, newvalues)
+    print(x.modified_count, " documento(s) atualizado(s).")
 
-    
-    deleteQueryfavoritos(codigo)
+def updatecompras(query, newvalues):
+    global mydb
+    mycolcom = mydb.compras
+    print("\n####UPDATE####")
+    x = mycolcom.update_many(query, newvalues)
+    print(x.modified_count, " documento(s) atualizado(s).")
 
+def updatefavoritos(query, newvalues):
+    global mydb
+    mycolfav = mydb.favoritos
+    print("\n####UPDATE####")
+    x = mycolfav.update_many(query, newvalues)
+    print(x.modified_count, " documento(s) atualizado(s).")
 
+def main():
+    while True:
+        print("\n----- MENU -----")
+        print("1 - Inserir usuário")
+        print("2 - Inserir produto")
+        print("3 - Inserir vendedor")
+        print("4 - Inserir compra")
+        print("5 - Inserir favorito")
+        print("6 - Ordenar usuários por nome")
+        print("7 - Ordenar produtos por nome")
+        print("8 - Ordenar vendedores por nome")
+        print("9 - Ordenar compras por valor")
+        print("10 - Ordenar favoritos por nome")
+        print("11 - Deletar usuário")
+        print("12 - Deletar vendedor")
+        print("13 - Deletar compra")
+        print("14 - Deletar favorito")
+        print("15 - Atualizar usuário")
+        print("16 - Atualizar vendedor")
+        print("17 - Atualizar compra")
+        print("18 - Atualizar favorito")
+        print("0 - Sair")
 
+        choice = int(input("Escolha uma opção: "))
 
+        if choice == 1:
+            nome = input("Digite o nome do usuário: ")
+            cpf = input("Digite o CPF do usuário: ")
+            email = input("Digite o e-mail do usuário: ")
+            rua = input("Digite o nome da rua: ")
+            numero = input("Digite o número da rua: ")
+            bairro = input("Digite o nome do bairro: ")
+            cidade = input("Digite o nome da cidade: ")
+            estado = input("Digite o nome do estado: ")
+            cep = input("Digite o CEP: ")
+            insert(nome, cpf, email, rua, numero, bairro, cidade, estado, cep)
 
+        elif choice == 2:
+            produto = input("Digite o nome do produto: ")
+            quantidade = input("Digite a quantidade do produto: ")
+            preco = input("Digite o preço do produto: ")
+            insertproduto(produto, quantidade, preco)
 
+        elif choice == 3:
+            vendedor = input("Digite o nome do vendedor: ")
+            codigo = input("Digite o código do vendedor: ")
+            insertvendedor(vendedor, codigo)
 
+        elif choice == 4:
+            nome_prod = input("Digite o nome do produto: ")
+            codigo = input("Digite o código da compra: ")
+            valor = input("Digite o valor da compra: ")
+            insertcompras(nome_prod, codigo, valor)
 
+        elif choice == 5:
+            nome_prod = input("Digite o nome do produto: ")
+            codigo = input("Digite o código do favorito: ")
+            insertfavoritos(nome_prod, codigo)
 
+        elif choice == 6:
+            findSort("nome")
 
+        elif choice == 7:
+            findSortprodutos("produto")
 
+        elif choice == 8:
+            findSortvendedor("vendedor")
 
+        elif choice == 9:
+            findSortcompras("valor")
+
+        elif choice == 10:
+            findSortfavoritos("nomeprod")
+
+        elif choice == 11:
+            cpf = input("Digite o CPF do usuário a ser deletado: ")
+            query = {"cpf": cpf}
+            delete(query)
+
+        elif choice == 12:
+            codigo = input("Digite o código do vendedor a ser deletado: ")
+            query = {"codigo": codigo}
+            deletevendedor(query)
+
+        elif choice == 13:
+            codigo = input("Digite o código da compra a ser deletada: ")
+            query = {"codigo": codigo}
+            deletecompras(query)
+
+        elif choice == 14:
+            codigo = input("Digite o código do favorito a ser deletado: ")
+            query = {"codigo": codigo}
+            deletefavoritos(query)
+
+        elif choice == 15:
+            cpf = input("Digite o CPF do usuário a ser atualizado: ")
+            query = {"cpf": cpf}
+            nome = input("Digite o novo nome do usuário: ")
+            newvalues = {"$set": {"nome": nome}}
+            update(query, newvalues)
+
+        elif choice == 16:
+            codigo = input("Digite o código do vendedor a ser atualizado: ")
+            query = {"codigo": codigo}
+            vendedor = input("Digite o novo nome do vendedor: ")
+            newvalues = {"$set": {"vendedor": vendedor}}
+            updatevendedor(query, newvalues)
+
+        elif choice == 17:
+            codigo = input("Digite o código da compra a ser atualizada: ")
+            query = {"codigo": codigo}
+            valor = input("Digite o novo valor da compra: ")
+            newvalues = {"$set": {"valor": valor}}
+            updatecompras(query, newvalues)
+
+        elif choice == 18:
+            codigo = input("Digite o código do favorito a ser atualizado: ")
+            query = {"codigo": codigo}
+            nome_prod = input("Digite o novo nome do produto: ")
+            newvalues = {"$set": {"nomeprod": nome_prod}}
+            updatefavoritos(query, newvalues)
+
+        elif choice == 0:
+            break
+
+        else:
+            print("Opção inválida. Tente novamente.")
+
+if __name__ == '__main__':
+    main()
 
 
 
