@@ -68,6 +68,17 @@ def update_manual():
 def delete_all_nodes(collection):
     graph.run(f"MATCH (node:{collection}) DELETE node")
 
+# Função para adicionar um nó aos favoritos
+def add_to_favorites():
+    collection = input("Informe a coleção (Usuário, Vendedor, Produto, Compra): ")
+    node_id = input("Informe o ID do nó a ser adicionado aos favoritos: ")
+    favorite_node_id = input("Informe o ID do nó favorito: ")
+    properties = {
+        "favorite_of": favorite_node_id
+    }
+    update_node(collection, node_id, properties)
+    print("Nó adicionado aos favoritos com sucesso.")
+
 # Loop principal
 while True:
     print("\n=== MENU ===")
@@ -79,7 +90,8 @@ while True:
     print("6. Atualizar informações manualmente")
     print("7. Deletar um nó")
     print("8. Deletar todos os nós de uma coleção")
-    print("9. Sair")
+    print("9. Adicionar nó aos favoritos")
+    print("10. Sair")
 
     choice = input("Escolha uma opção: ")
 
@@ -113,6 +125,9 @@ while True:
         delete_all_nodes(collection)
         print(f"Todos os nós da coleção {collection} foram deletados.")
     elif choice == "9":
+        print("\n=== ADICIONAR NÓ AOS FAVORITOS ===")
+        add_to_favorites()
+    elif choice == "10":
         print("Saindo do programa...")
         break
     else:
