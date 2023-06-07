@@ -51,54 +51,73 @@ def insert_manual():
         properties[key] = value
     insert_node(collection, properties)
 
+# Função para atualizar informações manualmente
+def update_manual():
+    collection = input("Informe a coleção (Usuário, Vendedor, Produto, Compra): ")
+    node_id = input("Informe o ID do nó a ser atualizado: ")
+    properties = {}
+    while True:
+        key = input("Informe o nome da propriedade (ou deixe em branco para finalizar): ")
+        if not key:
+            break
+        value = input(f"Informe o novo valor para a propriedade '{key}': ")
+        properties[key] = value
+    update_node(collection, node_id, properties)
+
+# Função para deletar todos os nós de uma coleção
+def delete_all_nodes(collection):
+    graph.run(f"MATCH (node:{collection}) DELETE node")
+
 # Loop principal
 while True:
     print("\n=== MENU ===")
     print("1. Listar clientes")
     print("2. Listar produtos")
     print("3. Listar compras")
-    print("4. Inserir informações manualmente")
-    print("5. Deletar um nó")
-    print("6. Sair")
+    print("4. Listar vendedores")
+    print("5. Inserir informações manualmente")
+    print("6. Atualizar informações manualmente")
+    print("7. Deletar um nó")
+    print("8. Deletar todos os nós de uma coleção")
+    print("9. Sair")
 
     choice = input("Escolha uma opção: ")
-    
+
     if choice == "1":
         print("\n=== CLIENTES ===")
         list_nodes("Usuário")
-        continue_option = input("Pressione 'Enter' para voltar ao menu ou digite 's' para sair: ")
-        if continue_option.lower() == "s":
-            break
     elif choice == "2":
         print("\n=== PRODUTOS ===")
         list_nodes("Produto")
-        continue_option = input("Pressione 'Enter' para voltar ao menu ou digite 's' para sair: ")
-        if continue_option.lower() == "s":
-            break
     elif choice == "3":
         print("\n=== COMPRAS ===")
         list_nodes("Compra")
-        continue_option = input("Pressione 'Enter' para voltar ao menu ou digite 's' para sair: ")
-        if continue_option.lower() == "s":
-            break
     elif choice == "4":
+        print("\n=== VENDEDORES ===")
+        list_nodes("Vendedor")
+    elif choice == "5":
         print("\n=== INSERIR INFORMAÇÕES MANUALMENTE ===")
         insert_manual()
-        continue_option = input("Pressione 'Enter' para voltar ao menu ou digite 's' para sair: ")
-        if continue_option.lower() == "s":
-            break
-    elif choice == "5":
+    elif choice == "6":
+        print("\n=== ATUALIZAR INFORMAÇÕES MANUALMENTE ===")
+        update_manual()
+    elif choice == "7":
         node_id = input("Informe o ID do nó a ser deletado: ")
         delete_node("Usuário", node_id)
         delete_node("Vendedor", node_id)
         delete_node("Produto", node_id)
         delete_node("Compra", node_id)
         print("Nó deletado com sucesso.")
-        continue_option = input("Pressione 'Enter' para voltar ao menu ou digite 's' para sair: ")
-        if continue_option.lower() == "s":
-            break
-    elif choice == "6":
+    elif choice == "8":
+        collection = input("Informe a coleção a ser deletada (Usuário, Vendedor, Produto, Compra): ")
+        delete_all_nodes(collection)
+        print(f"Todos os nós da coleção {collection} foram deletados.")
+    elif choice == "9":
         print("Saindo do programa...")
         break
     else:
         print("Opção inválida. Tente novamente.")
+
+    continue_option = input("Pressione 'Enter' para voltar ao menu ou digite 's' para sair: ")
+    if continue_option.lower() == "s":
+        break
