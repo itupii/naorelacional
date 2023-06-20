@@ -124,6 +124,14 @@ def deletefavoritos(query):
     x = mycolfav.delete_many(query)
     print(x.deleted_count, " documento(s) deletado(s).")
 
+
+def deleteprodutos(query):
+    global mydb
+    mycolprod = mydb.produtos
+    print("\n####DELETE####")
+    x = mycolprod.delete_many(query)
+    print(x.deleted_count, " documento(s) deletado(s).")
+
 def update(query, newvalues):
     global mydb
     mycol = mydb.usuario
@@ -152,6 +160,13 @@ def updatefavoritos(query, newvalues):
     x = mycolfav.update_many(query, newvalues)
     print(x.modified_count, " documento(s) atualizado(s).")
 
+def updateprodutos(query, newvalues):
+    global mydb
+    mycolprod = mydb.produtos
+    print("\n####UPDATE####")
+    x = mycolprod.update_many(query, newvalues)
+    print(x.modified_count, " documento(s) atualizado(s).")
+
 def main():
     while True:
         print("\n----- MENU -----")
@@ -169,10 +184,12 @@ def main():
         print("12 - Deletar vendedor")
         print("13 - Deletar compra")
         print("14 - Deletar favorito")
-        print("15 - Atualizar usuário")
-        print("16 - Atualizar vendedor")
-        print("17 - Atualizar compra")
-        print("18 - Atualizar favorito")
+        print("15 - deletar produto")
+        print("16 - Atualizar usuário")
+        print("17 - Atualizar vendedor")
+        print("18 - Atualizar compra")
+        print("19 - Atualizar favorito")
+        print("20 - Atualizar produto")
         print("0 - Sair")
 
         choice = int(input("Escolha uma opção: "))
@@ -247,32 +264,44 @@ def main():
             deletefavoritos(query)
 
         elif choice == 15:
+            produto = input("Digite o nome do produto a ser deletado: ")
+            query = {"produto": produto}
+            deleteprodutos(query)
+
+        elif choice == 16:
             cpf = input("Digite o CPF do usuário a ser atualizado: ")
             query = {"cpf": cpf}
             nome = input("Digite o novo nome do usuário: ")
             newvalues = {"$set": {"nome": nome}}
             update(query, newvalues)
 
-        elif choice == 16:
+        elif choice == 17:
             codigo = input("Digite o código do vendedor a ser atualizado: ")
             query = {"codigo": codigo}
             vendedor = input("Digite o novo nome do vendedor: ")
             newvalues = {"$set": {"vendedor": vendedor}}
             updatevendedor(query, newvalues)
 
-        elif choice == 17:
+        elif choice == 18:
             codigo = input("Digite o código da compra a ser atualizada: ")
             query = {"codigo": codigo}
             valor = input("Digite o novo valor da compra: ")
             newvalues = {"$set": {"valor": valor}}
             updatecompras(query, newvalues)
 
-        elif choice == 18:
+        elif choice == 19:
             codigo = input("Digite o código do favorito a ser atualizado: ")
             query = {"codigo": codigo}
             nome_prod = input("Digite o novo nome do produto: ")
             newvalues = {"$set": {"nomeprod": nome_prod}}
             updatefavoritos(query, newvalues)
+
+        elif choice == 20:
+            produto = input("Digite o nome do produto a ser atualizado: ")
+            query = {"produto": produto}
+            quantidade = input("Digite a nova quantidade do produto: ")
+            newvalues = {"$set": {"quantidade": quantidade}}
+            updateprodutos(query, newvalues)    
 
         elif choice == 0:
             break
