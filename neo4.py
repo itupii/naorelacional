@@ -86,12 +86,15 @@ while True:
     print("2. Listar produtos")
     print("3. Listar compras")
     print("4. Listar vendedores")
-    print("5. Inserir informações manualmente")
-    print("6. Atualizar informações manualmente")
-    print("7. Deletar um nó")
-    print("8. Deletar todos os nós de uma coleção")
-    print("9. Adicionar nó aos favoritos")
-    print("10. Sair")
+    print("5- Listar favoritos de um cliente")
+    print("6- Inserir informações manualmente")
+    print("7- Atualizar informações manualmente")
+    print("8- Deletar um nó")
+    print("9- Deletar todos os nós de uma coleção")
+    print("10- Adicionar nó aos favoritos")
+
+
+    print("11. Sair")
 
     choice = input("Escolha uma opção: ")
 
@@ -107,27 +110,32 @@ while True:
     elif choice == "4":
         print("\n=== VENDEDORES ===")
         list_nodes("Vendedor")
+
     elif choice == "5":
+        print("\n=== FAVORITOS ===")
+        list_nodes("Favorito")
+    elif choice == "6":
         print("\n=== INSERIR INFORMAÇÕES MANUALMENTE ===")
         insert_manual()
-    elif choice == "6":
+    elif choice == "7":
         print("\n=== ATUALIZAR INFORMAÇÕES MANUALMENTE ===")
         update_manual()
-    elif choice == "7":
+    elif choice == "8":
         node_id = input("Informe o ID do nó a ser deletado: ")
         delete_node("Usuário", node_id)
         delete_node("Vendedor", node_id)
         delete_node("Produto", node_id)
         delete_node("Compra", node_id)
+        delete_node("Favorito", node_id)
         print("Nó deletado com sucesso.")
-    elif choice == "8":
-        collection = input("Informe a coleção a ser deletada (Usuário, Vendedor, Produto, Compra): ")
+    elif choice == "9":
+        collection = input("Informe a coleção a ser deletada (Usuário, Vendedor, Produto, Compra, Favorito): ")
         delete_all_nodes(collection)
         print(f"Todos os nós da coleção {collection} foram deletados.")
-    elif choice == "9":
+    elif choice == "10":
         print("\n=== ADICIONAR NÓ AOS FAVORITOS ===")
         add_to_favorites()
-    elif choice == "10":
+    elif choice == "11":
         print("Saindo do programa...")
         break
     else:
@@ -136,3 +144,4 @@ while True:
     continue_option = input("Pressione 'Enter' para voltar ao menu ou digite 's' para sair: ")
     if continue_option.lower() == "s":
         break
+

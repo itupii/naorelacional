@@ -1,6 +1,6 @@
-import cassandra
 from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
+import uuid
 
 class MercadoLivreDB:
     def __init__(self, secure_bundle_path, client_id, client_secret):
@@ -9,101 +9,255 @@ class MercadoLivreDB:
         cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
         self.session = cluster.connect("MercadoLivreDB")
 
-    def criar_tabela(self, tabela, colunas):
-        colunas_str = ', '.join(colunas)
-        query = f"CREATE TABLE IF NOT EXISTS {tabela} ({colunas_str});"
+    def criar_tabela(self, nome_tabela, campos):
+        self.session.execute(
+            f"CREATE TABLE IF NOT EXISTS {nome_tabela} ({', '.join(campos)});"
+        )
+
+    def inserir(self, id, nome, email):
+        self.session.execute(
+            """
+            INSERT INTO usuario (id, nome, email)
+            VALUES (%s, %s, %s)
+            """,
+            (id, nome, email)
+        )
+
+    def inserirVendedor (self, id, nome, sobrenome, loja):
+        self.session.execute(
+            """
+            INSERT INTO vendedor (id, nome, sobrenome, loja)
+            VALUES (%s, %s, %s, %s)
+            """,
+            (id, nome, sobrenome, loja)
+        )
+
+
+
+
+    def inserirCompra (self, id, nome, valor):
+        self.session.execute(
+            """
+            INSERT INTO compra (id, nome, valor)
+            VALUES (%s, %s, %s)
+            """,
+            (id, nome, valor)
+        )
+
+    def inserirFavorito (self, id, nome, produto):
+        self.session.execute(
+            """
+            INSERT INTO favorito (id, nome, produto)
+            VALUES (%s, %s, %s)
+            """,
+            (id, nome, produto)
+        )
+
+    def consultar(self, id):
+        query = f"SELECT * FROM usuario WHERE id = {id}"
+        rows = self.session.execute(query)
+        for row in rows:
+            print(f"ID: {row.id}, Nome: {row.nome}, Email: {row.email}")
+
+    def consultarVendedor(self, id):
+        query = f"SELECT * FROM vendedor WHERE id = {id}"
+        rows = self.session.execute(query)
+        for row in rows:
+            print(f"ID: {row.id}, Nome: {row.nome}, Sobrenome: {row.sobrenome}, Loja: {row.loja}")
+
+
+    def consultarCompra(self, id):
+        query = f"SELECT * FROM compra WHERE id = {id}"
+        rows = self.session.execute(query)
+        for row in rows:
+            print(f"ID: {row.id}, Nome: {row.nome}, Valor: {row.valor}")
+
+    def consultarFavorito(self, id):
+        query = f"SELECT * FROM favorito WHERE id = {id}"
+        rows = self.session.execute(query)
+        for row in rows:
+            print(f"ID: {row.id}, Nome: {row.nome}, Produto: {row.produto}")
+
+
+    def atualizar(self, id, campos, valor):
+        query = f"UPDATE usuario SET {', '.join([f'{campo} = %s' for campo in campos])} WHERE id = {id}"
+        self.session.execute(query, valor)
+
+    
+
+    def atualizarVendedor(self, id, campos, valor):
+        query = f"UPDATE vendedor SET {', '.join([f'{campo} = %s' for campo in campos])} WHERE id = {id}"
+        self.session.execute(query, valor)
+
+
+
+
+    def atualizarCompra(self, id, campos, valor):
+        query = f"UPDATE compra SET {', '.join([f'{campo} = %s' for campo in campos])} WHERE id = {id}"
+        self.session.execute(query, valor)    
+
+    def atualizarFavorito(self, id, campos, valor):
+        query = f"UPDATE favorito SET {', '.join([f'{campo} = %s' for campo in campos])} WHERE id = {id}"
+        self.session.execute(query, valor)
+
+
+
+    def deletar(self, id):
+        query = f"DELETE FROM usuario WHERE id = {id}"
         self.session.execute(query)
 
-        # Criar índice secundário para a coluna 'email'
-        index_query = f"CREATE INDEX IF NOT EXISTS idx_{tabela}_email ON {tabela} (email);"
-        self.session.execute(index_query)
-
-    def inserir(self, tabela, valores):
-        query = f"INSERT INTO {tabela} JSON %s;"
-        self.session.execute(query, [cassandra.util.json.dumps(valores)])
-
-    def buscar_por_email(self, tabela, email):
-        query = f"SELECT * FROM {tabela} WHERE email = %s;"
-        result = self.session.execute(query, [email])
-        return list(result)
-
-    def listar_usuarios(self, tabela):
-        query = f"SELECT * FROM {tabela};"
-        result = self.session.execute(query)
-        return list(result)
-
-    def atualizar(self, tabela, email, campos, valores):
-        id_query = f"SELECT id FROM {tabela} WHERE email = %s;"
-        id_result = self.session.execute(id_query, [email])
-        user_id = id_result[0].id if id_result else None
-
-        if user_id:
-            set_clause = ', '.join([f"{campo} = %s" for campo in campos])
-            query = f"UPDATE {tabela} SET {set_clause} WHERE id = %s;"
-            self.session.execute(query, valores + [user_id])
-
-    def deletar(self, tabela, email):
-        query = f"DELETE FROM {tabela} WHERE email = %s;"
-        self.session.execute(query, [email])
+    def deletarVendedor(self, id):
+        query = f"DELETE FROM vendedor WHERE id = {id}"
+        self.session.execute(query)
 
 
+    def deletarCompra(self, id):
+        query = f"DELETE FROM compra WHERE id = {id}"
+        self.session.execute(query)
+
+    def deletarFavorito(self, id):
+        query = f"DELETE FROM favorito WHERE id = {id}"
+        self.session.execute(query)
 
 
-# Função para inserir um usuário manualmente
-def inserir_usuario_manual():
-    nome = input("Digite o nome do usuário: ")
-    email = input("Digite o e-mail do usuário: ")
+    
 
-    usuario_valores = {'nome': nome, 'email': email}
-    db.inserir('usuario', usuario_valores)
-    print("Usuário inserido com sucesso!")
+    def fechar(self):
+        self.session.shutdown()
+        self.session.cluster.shutdown()
 
+if __name__ == "__main__":
+    secure_bundle_path = "./secure-connect-mercadolivredb.zip"
+    client_id = "BuBEchYmSlumjBjbjeaElsOy"
+    client_secret = "Q_jJOR8Dv9Rm7QPwJBc1zp9RfpTLqgKk9eGO0m_f.FcfR,nFmFSjUrBqbr7+L6EZnSoOxO6Qyj_Dg39SQXv-ivfZq4wPvw7Wg0wljsn.ovKtU.O5Zx7zgmDo9KQXw0_0"
 
-# Função para listar todos os usuários
-def listar_usuarios():
-    usuarios = db.listar_usuarios('usuario')
-    print("Lista de Usuários:")
-    for usuario in usuarios:
-        print(f"ID: {usuario.id}, Nome: {usuario.nome}, Email: {usuario.email}")
+    db = MercadoLivreDB(secure_bundle_path, client_id, client_secret)
 
+    def inserir_usuario():
+        id = uuid.uuid4()
+        print("ID do usuário: ", id)
+        nome = input("Digite o nome: ")
+        email = input("Digite o e-mail: ")
+        db.inserir(id, nome, email)
+        print("Usuário inserido com sucesso!")
 
-# Função para pesquisar um usuário por e-mail
-def pesquisar_usuario():
-    email = input("Digite o e-mail do usuário: ")
-    usuario = db.buscar_por_email('usuario', email)
-    if usuario:
-        print(f"ID: {usuario[0].id}, Nome: {usuario[0].nome}, Email: {usuario[0].email}")
-    else:
-        print("Usuário não encontrado.")
+    def consultar_usuario():
+        id = str(input("Digite o ID do usuário: "))
+        db.consultar(id)
 
 
-# Função para alterar os dados de um usuário
-def alterar_usuario():
-    email = input("Digite o e-mail do usuário: ")
-    usuario = db.buscar_por_email('usuario', email)
-    if usuario:
-        id = usuario[0].id
-        nome = input("Digite o novo nome do usuário: ")
-        novo_email = input("Digite o novo e-mail do usuário: ")
+    def atualizar_usuario():
+        id = str(input("Digite o ID do usuário: "))
+        nome = input("Digite o nome: ")
+        email = input("Digite o e-mail: ")
         campos = ['nome', 'email']
-        valores = [nome, novo_email]
-
-        db.atualizar('usuario', email, campos, valores)
+        valores = [nome, email]
+        db.atualizar(id, campos, valores)
         print("Usuário atualizado com sucesso!")
-    else:
-        print("Usuário não encontrado.")
 
 
-# Função para deletar um usuário
-def deletar_usuario():
-    email = input("Digite o e-mail do usuário a ser deletado: ")
-    usuario = db.buscar_por_email('usuario', email)
-    if usuario:
-        db.deletar('usuario', email)
+    def deletar_usuario():
+        id = str(input("Digite o ID do usuário: "))
+        db.deletar(id)
         print("Usuário deletado com sucesso!")
-    else:
-        print("Usuário não encontrado.")
 
+
+
+    def inserir_Vendedor():
+        id = uuid.uuid4()
+        print("ID do vendedor: ", id)
+    
+        nome = input("Digite o nome: ")
+        sobrenome = input("Digite o sobrenome: ")
+        loja = input("Digite o nome da loja: ")
+        db.inserirVendedor(id, nome, sobrenome, loja)   
+        print("Vendedor inserido com sucesso!")
+    
+
+
+    def consultar_Vendedor():
+        id = str(input("Digite o id: "))
+        db.consultarVendedor(id)
+
+    def atualizar_Vendedor():
+        id = str(input("Digite o id: "))
+        nome = input("Digite o nome: ")
+        sobrenome = input("Digite o sobrenome: ")
+        loja = input("Digite o nome da loja: ")
+        campos = ['nome','sobrenome',  'loja']
+        valores = [nome, sobrenome,   loja]
+        db.atualizarVendedor(id, campos, valores)
+        print("Vendedor atualizado com sucesso!")
+
+    
+
+    def deletar_Vendedor():
+        id = str(input("Digite o id: "))
+        db.deletarVendedor(id)
+        print("Vendedor deletado com sucesso!")
+
+
+
+    def inserir_Compra():
+        id = uuid.uuid4()
+        print ("ID da compra: ", id)
+        nome = input("Digite o nome: ")
+        valor = float(input("Digite o valor: "))
+        db.inserirCompra(id, nome, valor)
+        print("Compra inserida com sucesso!")
+
+
+    def consultar_Compra():
+        id = str(input("Digite o id: "))
+        db.consultarCompra(id)
+        print("Compra encontrada com sucesso!")
+
+    def atualizar_Compra():
+        id = str(input("Digite o id: "))
+        nome = input("Digite o nome: ")
+        valor = float(input("Digite o valor: "))
+        campos = ['nome', 'valor']
+        valores = [nome, valor]
+        db.atualizarCompra(id, campos, valores)
+        print("Compra atualizada com sucesso!")
+
+    def deletar_Compra():
+        id = str(input("Digite o id: "))
+        db.deletarCompra(id)
+        print("Compra deletada com sucesso!")
+
+    def inserir_favoritoCLI():
+        id = uuid.uuid4()
+        print ("ID do favorito: ", id)
+        nome = input("Digite o nome: ")
+        produto = input("Digite o nome do produto: ")
+        db.inserirFavorito(id, nome, produto)
+        print("Favorito inserido com sucesso!")
+
+
+
+    def consultar_favoritoCLI():
+        id = str(input("Digite o id: "))
+        db.consultarFavorito(id)
+        print("Favorito encontrado com sucesso!")
+
+    
+
+    def atualizar_FavoritoCLI():
+        id = str(input("Digite o id: "))
+        nome = input("Digite o nome: ")
+        produto = input("Digite o nome do produto: ")
+        campos = ['nome', 'produto']
+        valor = [nome, produto]
+        db.atualizarFavorito(id, campos, valor)
+        print("Favorito atualizado com sucesso!")
+        
+
+    def deletar_FavoritoCLI():
+        id = str(input("Digite o id: "))
+        db.deletarFavorito(id)
+        print("Favorito deletado com sucesso!")
+        
 
 # Configurações de autenticação e conexão
 secure_bundle_path = './secure-connect-mercadolivredb.zip'
@@ -113,34 +267,102 @@ client_secret = 'Q_jJOR8Dv9Rm7QPwJBc1zp9RfpTLqgKk9eGO0m_f.FcfR,nFmFSjUrBqbr7+L6E
 # Criação da instância do banco de dados
 db = MercadoLivreDB(secure_bundle_path, client_id, client_secret)
 db.criar_tabela('usuario', ['id UUID PRIMARY KEY', 'nome TEXT', 'email TEXT'])
+db.criar_tabela('vendedor', ['id UUID PRIMARY KEY', 'nome TEXT', 'sobrenome TEXT', 'loja TEXT'])
+db.criar_tabela('compra', ['id UUID PRIMARY KEY', 'nome TEXT', 'valor FLOAT'])
+db.criar_tabela('favorito', ['id UUID PRIMARY KEY', 'nome TEXT', 'produto TEXT'])
 
-# Loop para realizar operações com usuários
+
+# Menu principal
 while True:
-    print("\nO que você deseja fazer?")
-    print("1. Inserir um novo usuário")
-    print("2. Listar todos os usuários")
-    print("3. Pesquisar um usuário por e-mail")
-    print("4. Alterar os dados de um usuário")
-    print("5. Deletar um usuário")
-    print("6. Sair")
-    
-    opcao = input("Digite o número da opção desejada: ")
-    
-    if opcao == "1":
-        inserir_usuario_manual()
-    elif opcao == "2":
-        listar_usuarios()
-    elif opcao == "3":
-        pesquisar_usuario()
-    elif opcao == "4":
-        alterar_usuario()
-    elif opcao == "5":
-        deletar_usuario()
-    elif opcao == "6":
+    print("Bem-vindo ao Mercado Livre!")
+    print("1 - Usuário")
+    print("2 - Vendedor")
+    print("3 - Compra")
+    print("4 - Favorito")
+    print("0 - Sair")
+    opcao = int(input("Digite a opção desejada: "))
+    if opcao == 1:
+        print("1 - Inserir")
+        print("2 - Consultar")
+        print("3 - Alterar")
+        print("4 - Deletar")
+        print("0 - Voltar")
+        opcao = int(input("Digite a opção desejada: "))
+        if opcao == 1:
+            inserir_usuario()
+        elif opcao == 2:
+            consultar_usuario()
+        elif opcao == 3:
+            atualizar_usuario()
+        elif opcao == 4:
+            deletar_usuario()
+        elif opcao == 0:
+            continue
+        else:
+            print("Opção inválida.")
+    elif opcao == 2:
+        print("1 - Inserir")
+        print("2 - Consultar")
+        print("3 - Alterar")
+        print("4 - Deletar")
+        print("0 - Voltar")
+        opcao = int(input("Digite a opção desejada: "))
+        if opcao == 1:
+            inserir_Vendedor()
+        elif opcao == 2:
+            consultar_Vendedor()
+        elif opcao == 3:
+            atualizar_Vendedor()
+        elif opcao == 4:
+            deletar_Vendedor()
+        elif opcao == 0:
+            continue
+        else:
+            print("Opção inválida.")
+    elif opcao == 3:
+        print("1 - Inserir")
+        print("2 - Consultar")
+        print("3 - Alterar")
+        print("4 - Deletar")
+        print("0 - Voltar")
+        opcao = int(input("Digite a opção desejada: "))
+        if opcao == 1:
+            inserir_Compra()
+        elif opcao == 2:
+            consultar_Compra()
+        elif opcao == 3:
+            atualizar_Compra()
+        elif opcao == 4:
+            deletar_Compra()
+        elif opcao == 0:
+            continue
+        else:
+            print("Opção inválida.")
+
+    elif opcao == 4:
+        print("1 - Inserir")
+        print("2 - Consultar")
+        print("3 - Alterar")
+        print("4 - Deletar")
+        print("0 - Voltar")
+        opcao = int(input("Digite a opção desejada: "))
+        if opcao == 1:
+            inserir_favoritoCLI()
+        elif opcao == 2:
+            consultar_favoritoCLI()
+        elif opcao == 3:
+            atualizar_FavoritoCLI()
+        elif opcao == 4:
+            deletar_FavoritoCLI()
+        elif opcao == 0:
+            continue
+        else:
+            print("Opção inválida.")
+    elif opcao == 0:
         break
-    else:
-        print("Opção inválida. Tente novamente.")
-    
-    opcao_continuar = input("Deseja voltar ao menu principal? (s/n): ")
-    if opcao_continuar.lower() != 's':
-        break
+
+
+
+
+
+
