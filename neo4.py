@@ -1,158 +1,246 @@
 from py2neo import Graph, Node
 
 # Conexão com o banco de dados Neo4j
-graph = Graph("neo4j+s://9e04d591.databases.neo4j.io", auth=("neo4j", "vxcxh7Zg7FjOoP5DSfo6oIC6x5-aVlKOTsHOipNSmbY"))
+graph = Graph("neo4j+s://83fb1521.databases.neo4j.io", auth=("neo4j", "xwMIT3boYBgtXMOhHzRsjDMMsdL6DFd-uuiUWRvWkA8"))
 
-# Função para inserir um nó em uma coleção
-def insert_node(collection, properties):
-    node = Node(collection, **properties)
-    graph.create(node)
+print ( ' \n ---* BEM VINDO AO MERCADO LIVRE *---' )
 
-# Função para atualizar um nó em uma coleção
-def update_node(collection, node_id, properties):
-    node = graph.nodes.match(collection, id=node_id).first()
-    if node:
-        for key, value in properties.items():
-            node[key] = value
-        graph.push(node)
+print ( " \n *** Cadastro ***" )
+print ( " \n 1 - Cadastrar usuario" )
+print ( " \n 2 - Cadastrar produto" )
+print ( " \n 3 - Cadastrar vendedor" )
+print ( " \n 4 - Cadastrar favorito" )
 
-# Função para pesquisar nós em uma coleção
-def search_nodes(collection, properties):
-    query = f"MATCH (node:{collection})"
-    if properties:
-        query += " WHERE "
-        conditions = []
-        for key, value in properties.items():
-            conditions.append(f"node.{key} = '{value}'")
-        query += " AND ".join(conditions)
-    query += " RETURN node"
-    result = graph.run(query)
-    return result
+print ( " \n *** Listagem de Dados ***" )
+print ( " \n 5 - Listar usuario" )
+print ( " \n 6 - Listar produto" )
+print ( " \n 7 - Listar vendedor" )
 
-# Função para excluir um nó em uma coleção
-def delete_node(collection, node_id):
-    graph.run(f"MATCH (node:{collection} {{id: '{node_id}'}}) DELETE node")
+print ( " \n *** Atualizar Dados ***" )
+print ( " \n 8 - Atualizar dados de usuario" )
+print ( " \n 9 - Atualizar dados de produto" )
+print ( " \n 10 - Atualizar dados do vendedor" )
 
-# Função para listar todos os nós de uma coleção
-def list_nodes(collection):
-    result = graph.run(f"MATCH (node:{collection}) RETURN node")
-    for record in result:
-        print(record["node"])
+print ( " \n *** Deletar ***" )
+print ( " \n 11 - Excluir usuario" )
+print ( " \n 12 - Excluir produto" )
+print ( " \n 13 - Deletar vendedor" )
+print ( " \n 14 - Deletar Favoritos" )
+print ( " \n 15 - Deletar relacao")
 
-# Função para inserir informações manualmente
-def insert_manual():
-    collection = input("Informe a coleção (Usuário, Vendedor, Produto, Compra): ")
-    properties = {}
-    while True:
-        key = input("Informe o nome da propriedade (ou deixe em branco para finalizar): ")
-        if not key:
-            break
-        value = input(f"Informe o valor para a propriedade '{key}': ")
-        properties[key] = value
-    insert_node(collection, properties)
+opcao  =  int ( input ( ' \n Digite o numero da opcao desejada: ' ))
 
-# Função para atualizar informações manualmente
-def update_manual():
-    collection = input("Informe a coleção (Usuário, Vendedor, Produto, Compra): ")
-    node_id = input("Informe o ID do nó a ser atualizado: ")
-    properties = {}
-    while True:
-        key = input("Informe o nome da propriedade (ou deixe em branco para finalizar): ")
-        if not key:
-            break
-        value = input(f"Informe o novo valor para a propriedade '{key}': ")
-        properties[key] = value
-    update_node(collection, node_id, properties)
+#criar usuário
+if opcao == 1:
+    nome = input('Digite o nome do usuario: ')
+    email = input('Digite o email do usuario: ')
+    usuario = Node('Usuario', nome=nome, email=email)
+    graph.create(usuario)
+    print('Usuario cadastrado com sucesso!')
 
-# Função para deletar todos os nós de uma coleção
-def delete_all_nodes(collection):
-    graph.run(f"MATCH (node:{collection}) DELETE node")
+#criar produto
+elif opcao == 2:
+    nome = input('Digite o nome do produto: ')
+    nomevendedor = input('Digite o nome do vendedor: ')
+    nomeUsuario = input('Digite o nome do usuario: ')
 
-# Função para adicionar um nó aos favoritos
-def add_to_favorites():
-    collection = input("Informe a coleção (Usuário, Vendedor, Produto, Compra): ")
-    node_id = input("Informe o ID do nó a ser adicionado aos favoritos: ")
-    favorite_node_id = input("Informe o ID do nó favorito: ")
-    properties = {
-        "favorite_of": favorite_node_id
-    }
-    update_node(collection, node_id, properties)
-    print("Nó adicionado aos favoritos com sucesso.")
+    #verificar se usuario e vendedor existem
+    consultar = """
+        MATCH (n:Usuario {nome: $nome})
+        RETURN n
+        """
+    resultado = graph.run(consultar, nome=nomeUsuario).data()
+    if resultado == []:
+        print('Usuario nao encontrado!')
+        exit()
+    consultar = """
+        MATCH (n:Vendedor {nome: $nome})
+        RETURN n
+        """
+    resultado = graph.run(consultar, nome=nomevendedor).data()
+    if resultado == []:
+        print('Vendedor nao encontrado!')
+        exit()
+
+    else :
+        #criar a relação "VENDER" em que o vendedor vende para o usuario
+        consultar = """
+        MATCH (a:Vendedor),(b:Usuario)
+        WHERE a.nome = $nomevendedor AND b.nome = $nomeUsuario
+        CREATE (a)-[r:VENDER]->(b)
+        RETURN type(r)
+        """
+    graph.run(consultar, nomevendedor=nomevendedor, nomeUsuario=nomeUsuario)
+    print('Relacao VENDER criada com sucesso!')
+
+#criar vendedor
+elif opcao == 3:
+    nome = input('Digite o nome do vendedor: ')
+    email = input('Digite o email do vendedor: ')
+    vendedor = Node('Vendedor', nome=nome, email=email)
+    graph.create(vendedor)
+    print('Vendedor cadastrado com sucesso!')   
+
+#criar favorito
+elif opcao == 4:
+    nomeUsuario = input('Digite o nome do usuario: ')
+    nomeProduto = input('Digite o nome do produto: ')
+
+   #verificar se usuario e produto existem
+    consultar = """
+        MATCH (n:Usuario {nome: $nome})
+        RETURN n
+        """
+    resultado = graph.run(consultar, nome=nomeUsuario).data()
+    if resultado == []:
+        print('Usuario nao encontrado!')
+        exit()
+    consultar = """
+        MATCH (n:Produto {nome: $nome})
+        RETURN n
+        """
+    resultado = graph.run(consultar, nome=nomeProduto).data()
+    if resultado == []:
+        print('Produto nao encontrado!')
+        exit()
+
+    else :
+#criar a relacao "FAVORITO" entre usuario e produto
+        consultar = """
+        MATCH (a:Usuario),(b:Produto)
+        WHERE a.nome = $nomeUsuario AND b.nome = $nomeProduto
+        CREATE (a)-[r:FAVORITO]->(b)
+        RETURN type(r)
+        """
+    graph.run(consultar, nomeUsuario=nomeUsuario, nomeProduto=nomeProduto)
+    print('Favorito cadastrado com sucesso!')
 
 
- # função para criar qualquer tipo de nó
-def create_node(collection, properties):
-    node = Node(collection, **properties)
-    graph.create(node)
+    
+    
 
 
-# Loop principal
-while True:
-    print("\n=== MENU ===")
-    print("1. Listar clientes")
-    print("2. Listar produtos")
-    print("3. Listar compras")
-    print("4. Listar vendedores")
-    print("5- Listar favoritos de um cliente")
-    print("6- Inserir informações manualmente")
-    print("7- Atualizar informações manualmente")
-    print("8- criar um nó")
-    print("9- Deletar todos os nós de uma coleção")
-    print("10- Adicionar nó aos favoritos")
+
+#listar usuario
+elif opcao == 5:
+    consultar = """
+        MATCH (n:Usuario)
+        RETURN n
+        """
+    resultado = graph.run(consultar).data()
+    print(resultado)
+
+#listar produto
+elif opcao == 6:
+    consultar = """
+        MATCH (n:Produto)
+        RETURN n
+        """
+    resultado = graph.run(consultar).data()
+    print(resultado)
+
+#listar vendedor
+elif opcao == 7:
+    consultar = """
+        MATCH (n:Vendedor)
+        RETURN n
+        """
+    resultado = graph.run(consultar).data()
+    print(resultado)
+
+#atualizar dados de usuario
+elif opcao == 8:
+    nome = input('Digite o nome do usuario: ')
+    email = input('Digite o email do usuario: ')
+    consultar = """
+        MATCH (n:Usuario {nome: $nome})
+        SET n.email = $email
+        RETURN n
+        """
+    resultado = graph.run(consultar, nome=nome, email=email).data()
+    print(resultado)
+
+#atualizar dados de produto
+elif opcao == 9:
+    nome = input('Digite o nome do produto: ')
+    preco = input('Digite o preco do produto: ')
+    consultar = """
+        MATCH (n:Produto {nome: $nome})
+        SET n.preco = $preco
+        RETURN n
+        """
+    resultado = graph.run(consultar, nome=nome, preco=preco).data()
+    print(resultado)
+
+#atualizar dados do vendedor
+elif opcao == 10:
+    nome = input('Digite o nome do vendedor: ')
+    email = input('Digite o email do vendedor: ')
+    consultar = """
+        MATCH (n:Vendedor {nome: $nome})
+        SET n.email = $email
+        RETURN n
+        """
+    resultado = graph.run(consultar, nome=nome, email=email).data()
+    print(resultado)
+
+#excluir usuario
+elif opcao == 11:
+    nome = input('Digite o nome do usuario: ')
+    consultar = """
+        MATCH (n:Usuario {nome: $nome})
+        DETACH DELETE n
+        """
+    resultado = graph.run(consultar, nome=nome).data()
+    print(resultado)
+
+#excluir produto
+elif opcao == 12:
+    nome = input('Digite o nome do produto: ')
+    consultar = """
+        MATCH (n:Produto {nome: $nome})
+        DETACH DELETE n
+        """
+    resultado = graph.run(consultar, nome=nome).data()
+    print(resultado)
+
+#excluir vendedor
+elif opcao == 13:
+    nome = input('Digite o nome do vendedor: ')
+    consultar = """
+        MATCH (n:Vendedor {nome: $nome})
+        DETACH DELETE n
+        """
+    resultado = graph.run(consultar, nome=nome).data()
+    print(resultado)
+
+#excluir favorito
+elif opcao == 14:
+    nome = input('Digite o nome do favorito: ')
+    consultar = """
+        MATCH (n:Favorito {nome: $nome})
+        DETACH DELETE n
+        """
+    resultado = graph.run(consultar, nome=nome).data()
+    print(resultado)
+
+elif opcao == 15:
+    #excluir relacao
+    nomeUsuario = input('Digite o nome do usuario: ')
+    nomeProduto = input('Digite o nome do produto: ')
+    consultar = """
+        MATCH (a:Usuario {nome: $nomeUsuario})-[r:FAVORITO]->(b:Produto {nome: $nomeProduto})
+        DELETE r
+        """
+    resultado = graph.run(consultar, nomeUsuario=nomeUsuario, nomeProduto=nomeProduto).data()
+    print(resultado)
+    
+else:
+
+    print ( ' \n Opcao invalida! ' )
 
 
-    print("11. Sair")
 
-    choice = input("Escolha uma opção: ")
+    
 
-    if choice == "1":
-        print("\n=== CLIENTES ===")
-        list_nodes("Usuário")
-    elif choice == "2":
-        print("\n=== PRODUTOS ===")
-        list_nodes("Produto")
-    elif choice == "3":
-        print("\n=== COMPRAS ===")
-        list_nodes("Compra")
-    elif choice == "4":
-        print("\n=== VENDEDORES ===")
-        list_nodes("Vendedor")
-
-    elif choice == "5":
-        print("\n=== FAVORITOS ===")
-        list_nodes("Favorito")
-    elif choice == "6":
-        print("\n=== INSERIR INFORMAÇÕES MANUALMENTE ===")
-        insert_manual()
-    elif choice == "7":
-        print("\n=== ATUALIZAR INFORMAÇÕES MANUALMENTE ===")
-        update_manual()
-    elif choice == "8":
-        print("\n=== CRIAR NÓ ===")
-        collection = input("Informe a coleção : ")
-        properties = {}
-        while True:
-            key = input("Informe o nome da propriedade (ou deixe em branco para finalizar): ")
-            if not key:
-                break
-            value = input(f"Informe o valor para a propriedade '{key}': ")
-            properties[key] = value
-        create_node(collection, properties)
-
-    elif choice == "9":
-        collection = input("Informe a coleção a ser deletada (Usuário, Vendedor, Produto, Compra, Favorito): ")
-        delete_all_nodes(collection)
-        print(f"Todos os nós da coleção {collection} foram deletados.")
-    elif choice == "10":
-        print("\n=== ADICIONAR NÓ AOS FAVORITOS ===")
-        add_to_favorites()
-    elif choice == "11":
-        print("Saindo do programa...")
-        break
-    else:
-        print("Opção inválida. Tente novamente.")
-
-    continue_option = input("Pressione 'Enter' para voltar ao menu ou digite 's' para sair: ")
-    if continue_option.lower() == "s":
-        break
 

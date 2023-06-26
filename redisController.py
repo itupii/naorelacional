@@ -1,7 +1,7 @@
-
 import redis
 import pymongo
 import json
+import time
 from pymongo.server_api import ServerApi
 
 # Conexão com o Redis
@@ -54,15 +54,31 @@ def iniciarRedis():
             r.set('usuario', updated_json)
 
             # Atualizar os dados no MongoDB
-            # Atualizar os dados no MongoDB
             collection.update_one({"_id": client_data["_id"]}, {"$set": {"favoritos": redis_dict["favoritos"]}})
 
-
             print("Novo favorito cadastrado")
+
+            Fast_Buy = input("Digite o seu Fast Buy: ")
+            collection.update_one({"_id": client_data["_id"]}, {"$set": {"Fast_Buy": Fast_Buy}})
+            print("Fast Buy adicionado! Você tem 10s para comprar tudo pela metade do preço")
+
+            time.sleep(10)
+
+            collection.update_one({"_id": client_data["_id"]}, {"$unset": {"Fast_Buy": ""}})
+            print("Fast Buy removido!")
+
+
+            # Timer de 10 segundos
+            print("Aguardando 10 segundos...")
+            time.sleep(10)
+            print("Timer de 10 segundos expirado.")
+
         else:
             print("Erro ao obter os dados do Redis")
     else:
         print("Cliente não encontrado no MongoDB")
+
+
 
 # Chamar a função iniciarRedis para executar o código
 iniciarRedis()

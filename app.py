@@ -14,13 +14,12 @@ mycolprod = ["produtos"]
 mycolfav = ["favoritos"]
 mycolcom = ["compras"]
 
-print("--- BEM VINDO AO MERCADO LIVRE ---")
 
-def insert(nome, cpf, email, rua, numero, bairro, cidade, estado, cep):
+def insert(nome, cpf, email, rua, numero, bairro, cidade, estado, cep, favorito, preço):
     global mydb
     mycol = mydb.usuario
     print("\n####INSERT####")
-    mydict = {"nome": nome, "cpf": cpf, "email": email, "rua": rua, "numero": numero, "bairro": bairro, "cidade": cidade, "estado": estado, "cep": cep}
+    mydict = {"nome": nome, "cpf": cpf, "email": email, "rua": rua, "numero": numero, "bairro": bairro, "cidade": cidade, "estado": estado, "cep": cep, "favorito": favorito, "preço": preço}
     x = mycol.insert_one(mydict)
     print(x.inserted_id)
 
@@ -32,11 +31,11 @@ def insertproduto(produto, quantidade, preco):
     x = mycolprod.insert_one(mydict)
     print(x.inserted_id)
 
-def insertvendedor(vendedor, codigo):
+def insertvendedor(vendedor, codigo, produtoVendido):
     global mydb
     mycolvend = mydb.vendedor
     print("\n####INSERT####")
-    mydict = {"vendedor": vendedor, "codigo": codigo}
+    mydict = {"vendedor": vendedor, "codigo": codigo, "produtoVendido": produtoVendido}
     x = mycolvend.insert_one(mydict)
     print(x.inserted_id)
 
@@ -96,222 +95,192 @@ def findSortfavoritos(favoritos):
     for x in mydoc:
         print(x)
 
-def delete(query):
+def find(nome):
+    global mydb
+    mycol = mydb.usuario
+    print("\n####FIND####")
+    myquery = {"nome": nome}
+    mydoc = mycol.find(myquery)
+    for x in mydoc:
+        print(x)
+
+def findprodutos(produto):
+    global mydb
+    mycolprod = mydb.produtos
+    print("\n####FIND####")
+    myquery = {"produto": produto}
+    mydoc = mycolprod.find(myquery)
+    for x in mydoc:
+        print(x)
+
+def findvendedor(vendedor):
+    global mydb
+    mycolvend = mydb.vendedor
+    print("\n####FIND####")
+    myquery = {"vendedor": vendedor}
+    mydoc = mycolvend.find(myquery)
+    for x in mydoc:
+        print(x)
+
+def findcompras(compras):
+    global mydb
+    mycolcom = mydb.compras
+    print("\n####FIND####")
+    myquery = {"compras": compras}
+    mydoc = mycolcom.find(myquery)
+    for x in mydoc:
+        print(x)
+
+def findfavoritos(favoritos):
+    global mydb
+    mycolfav = mydb.favoritos
+    print("\n####FIND####")
+    myquery = {"favoritos": favoritos}
+    mydoc = mycolfav.find(myquery)
+    for x in mydoc:
+        print(x)
+
+def deleteOne(nome):
     global mydb
     mycol = mydb.usuario
     print("\n####DELETE####")
-    x = mycol.delete_many(query)
-    print(x.deleted_count, " documento(s) deletado(s).")
+    myquery = {"nome": nome}
+    mycol.delete_one(myquery)
+    print("Registro deletado com sucesso!")
 
-def deletevendedor(query):
-    global mydb
-    mycolvend = mydb.vendedor
-    print("\n####DELETE####")
-    x = mycolvend.delete_many(query)
-    print(x.deleted_count, " documento(s) deletado(s).")
-
-def deletecompras(query):
-    global mydb
-    mycolcom = mydb.compras
-    print("\n####DELETE####")
-    x = mycolcom.delete_many(query)
-    print(x.deleted_count, " documento(s) deletado(s).")
-
-def deletefavoritos(query):
-    global mydb
-    mycolfav = mydb.favoritos
-    print("\n####DELETE####")
-    x = mycolfav.delete_many(query)
-    print(x.deleted_count, " documento(s) deletado(s).")
-
-
-def deleteprodutos(query):
+def deleteOneprod(produto):
     global mydb
     mycolprod = mydb.produtos
     print("\n####DELETE####")
-    x = mycolprod.delete_many(query)
-    print(x.deleted_count, " documento(s) deletado(s).")
+    myquery = {"produto": produto}
+    mycolprod.delete_one(myquery)
+    print("Registro deletado com sucesso!")
 
-def update(query, newvalues):
-    global mydb
-    mycol = mydb.usuario
-    print("\n####UPDATE####")
-    x = mycol.update_many(query, newvalues)
-    print(x.modified_count, " documento(s) atualizado(s).")
-
-def updatevendedor(query, newvalues):
+def deleteOnevendedor(vendedor):
     global mydb
     mycolvend = mydb.vendedor
-    print("\n####UPDATE####")
-    x = mycolvend.update_many(query, newvalues)
-    print(x.modified_count, " documento(s) atualizado(s).")
+    print("\n####DELETE####")
+    myquery = {"vendedor": vendedor}
+    mycolvend.delete_one(myquery)
+    print("Registro deletado com sucesso!")
 
-def updatecompras(query, newvalues):
+def deleteOnecompras(compras):
     global mydb
     mycolcom = mydb.compras
-    print("\n####UPDATE####")
-    x = mycolcom.update_many(query, newvalues)
-    print(x.modified_count, " documento(s) atualizado(s).")
+    print("\n####DELETE####")
+    myquery = {"compras": compras}
+    mycolcom.delete_one(myquery)
+    print("Registro deletado com sucesso!")
 
-def updatefavoritos(query, newvalues):
+def deleteOnefavoritos(favoritos):
     global mydb
     mycolfav = mydb.favoritos
-    print("\n####UPDATE####")
-    x = mycolfav.update_many(query, newvalues)
-    print(x.modified_count, " documento(s) atualizado(s).")
-
-def updateprodutos(query, newvalues):
-    global mydb
-    mycolprod = mydb.produtos
-    print("\n####UPDATE####")
-    x = mycolprod.update_many(query, newvalues)
-    print(x.modified_count, " documento(s) atualizado(s).")
-
-def main():
-    while True:
-        print("\n----- MENU -----")
-        print("1 - Inserir usuário")
-        print("2 - Inserir produto")
-        print("3 - Inserir vendedor")
-        print("4 - Inserir compra")
-        print("5 - Inserir favorito")
-        print("6 - Ordenar usuários por nome")
-        print("7 - Ordenar produtos por nome")
-        print("8 - Ordenar vendedores por nome")
-        print("9 - Ordenar compras por valor")
-        print("10 - Ordenar favoritos por nome")
-        print("11 - Deletar usuário")
-        print("12 - Deletar vendedor")
-        print("13 - Deletar compra")
-        print("14 - Deletar favorito")
-        print("15 - deletar produto")
-        print("16 - Atualizar usuário")
-        print("17 - Atualizar vendedor")
-        print("18 - Atualizar compra")
-        print("19 - Atualizar favorito")
-        print("20 - Atualizar produto")
-        print("0 - Sair")
-
-        choice = int(input("Escolha uma opção: "))
-
-        if choice == 1:
-            nome = input("Digite o nome do usuário: ")
-            cpf = input("Digite o CPF do usuário: ")
-            email = input("Digite o e-mail do usuário: ")
-            rua = input("Digite o nome da rua: ")
-            numero = input("Digite o número da rua: ")
-            bairro = input("Digite o nome do bairro: ")
-            cidade = input("Digite o nome da cidade: ")
-            estado = input("Digite o nome do estado: ")
-            cep = input("Digite o CEP: ")
-            insert(nome, cpf, email, rua, numero, bairro, cidade, estado, cep)
-
-        elif choice == 2:
-            produto = input("Digite o nome do produto: ")
-            quantidade = input("Digite a quantidade do produto: ")
-            preco = input("Digite o preço do produto: ")
-            insertproduto(produto, quantidade, preco)
-
-        elif choice == 3:
-            vendedor = input("Digite o nome do vendedor: ")
-            codigo = input("Digite o código do vendedor: ")
-            insertvendedor(vendedor, codigo)
-
-        elif choice == 4:
-            nome_prod = input("Digite o nome do produto: ")
-            codigo = input("Digite o código da compra: ")
-            valor = input("Digite o valor da compra: ")
-            insertcompras(nome_prod, codigo, valor)
-
-        elif choice == 5:
-            nome_prod = input("Digite o nome do produto: ")
-            codigo = input("Digite o código do favorito: ")
-            insertfavoritos(nome_prod, codigo)
-
-        elif choice == 6:
-            findSort("nome")
-
-        elif choice == 7:
-            findSortprodutos("produto")
-
-        elif choice == 8:
-            findSortvendedor("vendedor")
-
-        elif choice == 9:
-            findSortcompras("valor")
-
-        elif choice == 10:
-            findSortfavoritos("nomeprod")
-
-        elif choice == 11:
-            cpf = input("Digite o CPF do usuário a ser deletado: ")
-            query = {"cpf": cpf}
-            delete(query)
-
-        elif choice == 12:
-            codigo = input("Digite o código do vendedor a ser deletado: ")
-            query = {"codigo": codigo}
-            deletevendedor(query)
-
-        elif choice == 13:
-            codigo = input("Digite o código da compra a ser deletada: ")
-            query = {"codigo": codigo}
-            deletecompras(query)
-
-        elif choice == 14:
-            codigo = input("Digite o código do favorito a ser deletado: ")
-            query = {"codigo": codigo}
-            deletefavoritos(query)
-
-        elif choice == 15:
-            produto = input("Digite o nome do produto a ser deletado: ")
-            query = {"produto": produto}
-            deleteprodutos(query)
-
-        elif choice == 16:
-            cpf = input("Digite o CPF do usuário a ser atualizado: ")
-            query = {"cpf": cpf}
-            nome = input("Digite o novo nome do usuário: ")
-            newvalues = {"$set": {"nome": nome}}
-            update(query, newvalues)
-
-        elif choice == 17:
-            codigo = input("Digite o código do vendedor a ser atualizado: ")
-            query = {"codigo": codigo}
-            vendedor = input("Digite o novo nome do vendedor: ")
-            newvalues = {"$set": {"vendedor": vendedor}}
-            updatevendedor(query, newvalues)
-
-        elif choice == 18:
-            codigo = input("Digite o código da compra a ser atualizada: ")
-            query = {"codigo": codigo}
-            valor = input("Digite o novo valor da compra: ")
-            newvalues = {"$set": {"valor": valor}}
-            updatecompras(query, newvalues)
-
-        elif choice == 19:
-            codigo = input("Digite o código do favorito a ser atualizado: ")
-            query = {"codigo": codigo}
-            nome_prod = input("Digite o novo nome do produto: ")
-            newvalues = {"$set": {"nomeprod": nome_prod}}
-            updatefavoritos(query, newvalues)
-
-        elif choice == 20:
-            produto = input("Digite o nome do produto a ser atualizado: ")
-            query = {"produto": produto}
-            quantidade = input("Digite a nova quantidade do produto: ")
-            newvalues = {"$set": {"quantidade": quantidade}}
-            updateprodutos(query, newvalues)    
-
-        elif choice == 0:
-            break
-
-        else:
-            print("Opção inválida. Tente novamente.")
-
-if __name__ == '__main__':
-    main()
+    print("\n####DELETE####")
+    myquery = {"favoritos": favoritos}
+    mycolfav.delete_one(myquery)
+    print("Registro deletado com sucesso!")
 
 
+while True:
+    print("\n========================")
+    print("     MERCADO LIVRE")
+    print("========================")
+    print("1 - Inserir usuário")
+    print("2 - Inserir produto")
+    print("3 - Inserir vendedor")
+    print("4 - Inserir compras")
+    print("5 - Inserir favoritos")
+    print("6 - Ordenar usuários por nome")
+    print("7 - Ordenar produtos por nome")
+    print("8 - Ordenar vendedores por nome")
+    print("9 - Ordenar compras por nome")
+    print("10 - Ordenar favoritos por nome")
+    print("11 - Buscar usuário")
+    print("12 - Buscar produto")
+    print("13 - Buscar vendedor")
+    print("14 - Buscar compras")
+    print("15 - Buscar favoritos")
+    print("16 - Deletar usuário")
+    print("17 - Deletar produto")
+    print("18 - Deletar vendedor")
+    print("19 - Deletar compras")
+    print("20 - Deletar favoritos")
+    print("0 - Sair")
+    op = int(input("Digite uma opção: "))
 
-
+    if op == 1:
+        nome = input("Digite o nome do usuário: ")
+        cpf = input("Digite o CPF do usuário: ")
+        email = input("Digite o email do usuário: ")
+        rua = input("Digite a rua do usuário: ")
+        numero = input("Digite o número da casa do usuário: ")
+        bairro = input("Digite o bairro do usuário: ")
+        cidade = input("Digite a cidade do usuário: ")
+        estado = input("Digite o estado do usuário: ")
+        cep = input("Digite o CEP do usuário: ")
+        favorito = input("Digite o favorito do usuário: ")
+        preço = input("Digite o preço do produto: ")
+        insert(nome, cpf, email, rua, numero, bairro, cidade, estado, cep, favorito, preço)
+    elif op == 2:
+        produto = input("Digite o nome do produto: ")
+        quantidade = input("Digite a quantidade do produto: ")
+        preco = input("Digite o preço do produto: ")
+        insertproduto(produto, quantidade, preco)
+    elif op == 3:
+        vendedor = input("Digite o nome do vendedor: ")
+        codigo = input("Digite o código do vendedor: ")
+        produtoVendido = input("Digite o produto vendido pelo vendedor: ")
+        insertvendedor(vendedor, codigo, produtoVendido)
+    elif op == 4:
+        nome_prod = input("Digite o nome do produto: ")
+        codigo = input("Digite o código do produto: ")
+        valor = input("Digite o valor do produto: ")
+        insertcompras(nome_prod, codigo, valor)
+    elif op == 5:
+        nome_prod = input("Digite o nome do produto: ")
+        codigo = input("Digite o código do produto: ")
+        insertfavoritos(nome_prod, codigo)
+    elif op == 6:
+        findSort("nome")
+    elif op == 7:
+        findSortprodutos("produto")
+    elif op == 8:
+        findSortvendedor("vendedor")
+    elif op == 9:
+        findSortcompras("compras")
+    elif op == 10:
+        findSortfavoritos("favoritos")
+    elif op == 11:
+        nome = input("Digite o nome do usuário: ")
+        find(nome)
+    elif op == 12:
+        produto = input("Digite o nome do produto: ")
+        findprodutos(produto)
+    elif op == 13:
+        vendedor = input("Digite o nome do vendedor: ")
+        findvendedor(vendedor)
+    elif op == 14:
+        compras = input("Digite a compra: ")
+        findcompras(compras)
+    elif op == 15:
+        favoritos = input("Digite o favorito: ")
+        findfavoritos(favoritos)
+    elif op == 16:
+        nome = input("Digite o nome do usuário que deseja deletar: ")
+        deleteOne(nome)
+    elif op == 17:
+        produto = input("Digite o nome do produto que deseja deletar: ")
+        deleteOneprod(produto)
+    elif op == 18:
+        vendedor = input("Digite o nome do vendedor que deseja deletar: ")
+        deleteOnevendedor(vendedor)
+    elif op == 19:
+        compras = input("Digite a compra que deseja deletar: ")
+        deleteOnecompras(compras)
+    elif op == 20:
+        favoritos = input("Digite o favorito que deseja deletar: ")
+        deleteOnefavoritos(favoritos)
+    elif op == 0:
+        break
+    else:
+        print("Opção inválida. Digite novamente.")
