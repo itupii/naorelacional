@@ -79,6 +79,13 @@ def add_to_favorites():
     update_node(collection, node_id, properties)
     print("Nó adicionado aos favoritos com sucesso.")
 
+
+ # função para criar qualquer tipo de nó
+def create_node(collection, properties):
+    node = Node(collection, **properties)
+    graph.create(node)
+
+
 # Loop principal
 while True:
     print("\n=== MENU ===")
@@ -89,7 +96,7 @@ while True:
     print("5- Listar favoritos de um cliente")
     print("6- Inserir informações manualmente")
     print("7- Atualizar informações manualmente")
-    print("8- Deletar um nó")
+    print("8- criar um nó")
     print("9- Deletar todos os nós de uma coleção")
     print("10- Adicionar nó aos favoritos")
 
@@ -121,13 +128,17 @@ while True:
         print("\n=== ATUALIZAR INFORMAÇÕES MANUALMENTE ===")
         update_manual()
     elif choice == "8":
-        node_id = input("Informe o ID do nó a ser deletado: ")
-        delete_node("Usuário", node_id)
-        delete_node("Vendedor", node_id)
-        delete_node("Produto", node_id)
-        delete_node("Compra", node_id)
-        delete_node("Favorito", node_id)
-        print("Nó deletado com sucesso.")
+        print("\n=== CRIAR NÓ ===")
+        collection = input("Informe a coleção : ")
+        properties = {}
+        while True:
+            key = input("Informe o nome da propriedade (ou deixe em branco para finalizar): ")
+            if not key:
+                break
+            value = input(f"Informe o valor para a propriedade '{key}': ")
+            properties[key] = value
+        create_node(collection, properties)
+
     elif choice == "9":
         collection = input("Informe a coleção a ser deletada (Usuário, Vendedor, Produto, Compra, Favorito): ")
         delete_all_nodes(collection)

@@ -53,6 +53,15 @@ class MercadoLivreDB:
             (id, nome, produto)
         )
 
+    def inserirProduto (self, id, nome, preco):
+        self.session.execute(
+            """
+            INSERT INTO produto (id, nome, preco)
+            VALUES (%s, %s, %s)
+            """,
+            (id, nome, preco)
+        )
+
     def consultar(self, id):
         query = f"SELECT * FROM usuario WHERE id = {id}"
         rows = self.session.execute(query)
@@ -78,6 +87,12 @@ class MercadoLivreDB:
         for row in rows:
             print(f"ID: {row.id}, Nome: {row.nome}, Produto: {row.produto}")
 
+    def consultarProduto(self, id):
+        query = f"SELECT * FROM produto WHERE id = {id}"
+        rows = self.session.execute(query)
+        for row in rows:
+            print(f"ID: {row.id}, Nome: {row.nome}, Preço: {row.preco}")
+
 
     def atualizar(self, id, campos, valor):
         query = f"UPDATE usuario SET {', '.join([f'{campo} = %s' for campo in campos])} WHERE id = {id}"
@@ -100,6 +115,10 @@ class MercadoLivreDB:
         query = f"UPDATE favorito SET {', '.join([f'{campo} = %s' for campo in campos])} WHERE id = {id}"
         self.session.execute(query, valor)
 
+    def atualizarProduto(self, id, campos, valor):
+        query = f"UPDATE produto SET {', '.join([f'{campo} = %s' for campo in campos])} WHERE id = {id}"
+        self.session.execute(query, valor)
+
 
 
     def deletar(self, id):
@@ -117,6 +136,11 @@ class MercadoLivreDB:
 
     def deletarFavorito(self, id):
         query = f"DELETE FROM favorito WHERE id = {id}"
+        self.session.execute(query)
+
+
+    def deletarProduto(self, id):
+        query = f"DELETE FROM produto WHERE id = {id}"
         self.session.execute(query)
 
 
@@ -257,6 +281,37 @@ if __name__ == "__main__":
         id = str(input("Digite o id: "))
         db.deletarFavorito(id)
         print("Favorito deletado com sucesso!")
+
+    def inserir_Produto():
+        id = uuid.uuid4()
+        print ("ID do produto: ", id)
+        nome = input("Digite o nome: ")
+        preco = float(input("Digite o preço: "))
+        db.inserirProduto(id, nome, preco)
+        print("Produto inserido com sucesso!")
+
+
+    def consultar_Produto():
+
+        id = str(input("Digite o id: "))
+        db.consultarProduto(id)
+        print("Produto encontrado com sucesso!")
+
+    def atualizar_Produto():
+
+        id = str(input("Digite o id: "))
+        nome = input("Digite o nome: ")
+        preco = float(input("Digite o preço: "))
+        campos = ['nome', 'preco']
+        valor = [nome, preco]
+        db.atualizarProduto(id, campos, valor)
+        print("Produto atualizado com sucesso!")
+
+    def deletar_Produto():
+            
+            id = str(input("Digite o id: "))
+            db.deletarProduto(id)
+            print("Produto deletado com sucesso!")  
         
 
 # Configurações de autenticação e conexão
@@ -270,6 +325,7 @@ db.criar_tabela('usuario', ['id UUID PRIMARY KEY', 'nome TEXT', 'email TEXT'])
 db.criar_tabela('vendedor', ['id UUID PRIMARY KEY', 'nome TEXT', 'sobrenome TEXT', 'loja TEXT'])
 db.criar_tabela('compra', ['id UUID PRIMARY KEY', 'nome TEXT', 'valor FLOAT'])
 db.criar_tabela('favorito', ['id UUID PRIMARY KEY', 'nome TEXT', 'produto TEXT'])
+db.criar_tabela('produto', ['id UUID PRIMARY KEY', 'nome TEXT', 'preco FLOAT'])
 
 
 # Menu principal
@@ -279,6 +335,7 @@ while True:
     print("2 - Vendedor")
     print("3 - Compra")
     print("4 - Favorito")
+    print ("5 - Produto")
     print("0 - Sair")
     opcao = int(input("Digite a opção desejada: "))
     if opcao == 1:
@@ -358,6 +415,28 @@ while True:
             continue
         else:
             print("Opção inválida.")
+
+    elif opcao == 5:
+        print("1 - Inserir")
+        print("2 - Consultar")
+        print("3 - Alterar")
+        print("4 - Deletar")
+        print("0 - Voltar")
+        opcao = int(input("Digite a opção desejada: "))
+        if opcao == 1:
+            inserir_Produto()
+        elif opcao == 2:
+            consultar_Produto()
+        elif opcao == 3:
+            atualizar_Produto()
+        elif opcao == 4:
+            deletar_Produto()
+        elif opcao == 0:
+            continue
+        else:
+            print("Opção inválida.")
+            
+        
     elif opcao == 0:
         break
 
